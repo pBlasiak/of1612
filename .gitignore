@@ -48,6 +48,8 @@ log.*
 [1-9]*
 [0-9]*.[0-9]*
 !0.org
+applications/**/linux64Gcc*
+src/**/linux64Gcc*
 run/**/constant/polyMesh/*
 !run/**/constant/polyMesh/blockMeshDict
 constant/cellToRegion
