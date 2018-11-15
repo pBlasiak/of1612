@@ -1,0 +1,9 @@
+simplifiedSuperFluid/simplifiedSuperFluid.C
+simplifiedSuperFluid/newSimplifiedSuperFluid.C
+Kitamura/Kitamura.C
+Pietrowicz/Pietrowicz.C
+superFluidWall/superFluidWallFvPatchVectorField.C
+superFluidWallUn/superFluidWallUnFvPatchVectorField.C
+superFluidWallUs/superFluidWallUsFvPatchVectorField.C
+
+LIB = $(FOAM_USER_LIBBIN)/libsimplifiedSuperFluidModels

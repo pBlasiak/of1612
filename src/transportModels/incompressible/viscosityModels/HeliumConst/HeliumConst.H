@@ -1,0 +1,244 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::viscosityModels::HeliumConst
+
+Description
+     Standard power-law non-Newtonian viscosity model.
+
+SourceFiles
+    HeliumConst.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef HeliumConst_H
+#define HeliumConst_H
+
+#include "viscosityModel.H"
+#include "dimensionedScalar.H"
+#include "volFields.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace viscosityModels
+{
+
+/*---------------------------------------------------------------------------*\
+                           Class HeliumConst Declaration
+\*---------------------------------------------------------------------------*/
+
+
+class Helium;
+
+class HeliumConst
+:
+    public viscosityModel
+{
+    // Private data
+		//- Maximum index number for thermophysical tables i = 667
+		static const label indexMax_;
+
+		//- Step of temperature in the thermophysical tables dT = 0.001 K
+		static const scalar dT_;
+
+    // Protected data
+protected:
+		//- lambda Temperature 2.1711132461
+		static const dimensionedScalar Tlambda_;
+
+		//- Minimum temperature TMin = 1.5 K
+		static const dimensionedScalar TMin_;
+
+		//- Maximum temperature TMax = 2.167 K
+		static const dimensionedScalar TMax_;
+
+		//- Minimum index number for thermophysical tables i = 0
+		static const label indexMin_;
+
+		//- Table for betaHe
+		static const List<scalar> betaHeTable_;
+
+		//- Table for AGMHe
+		static const List<scalar> AGMHeTable_;
+
+		//- Table for sHe
+		static const List<scalar> sHeTable_;
+
+		//- Table for etaHe
+		static const List<scalar> etaHeTable_;
+
+		//- Table for cpHe
+		static const List<scalar> cpHeTable_;
+
+		//- Table for onebyf
+		static const List<scalar> onebyfTable_;
+
+		//- Table for rhoHe
+		static const List<scalar> rhoHeTable_;
+
+
+        dictionary HeliumConstCoeffs_;
+
+		dimensionedScalar TMean_;
+
+        //- Thermal expansion coefficient
+        volScalarField betaHe_;
+		
+        //- Goerter-Mellink parameter
+        volScalarField AGMHe_;
+
+        //- Entropy
+        volScalarField sHe_;
+		
+        //- Dynamic viscosity
+        volScalarField etaHe_;
+		
+        //- Specific heat at constant pressure
+        volScalarField cpHe_;
+		
+        //- Thermal conductivity function
+        volScalarField onebyf_;
+
+        //- Density of the mixture 
+        volScalarField rhoHe_;
+
+        //- Kinematic viscosity
+        volScalarField nu_;
+
+
+
+    // Private Member Functions
+
+        //- Calculate and return the laminar viscosity
+        tmp<volScalarField> calcNu() ;
+
+		//- Calculates helium thermal property based on mean temperature
+        void calcHeProp(volScalarField& vsf, const List<scalar>& vsfTable);
+
+
+		friend class Helium;
+		friend class HeliumConstRho;
+public:
+
+    //- Runtime type information
+    TypeName("HeliumConst");
+
+
+    // Constructors
+
+        //- Construct from components
+        HeliumConst
+        (
+            const word& name,
+            const dictionary& viscosityProperties,
+            const volVectorField& U,
+            const surfaceScalarField& phi
+        );
+
+
+    //- Destructor
+    virtual ~HeliumConst()
+    {}
+
+
+    // Member Functions
+
+        //- Return the laminar viscosity
+        tmp<volScalarField> nu() const override
+        {
+            return nu_;
+        }
+
+        //- Return the laminar viscosity for patch
+        tmp<scalarField> nu(const label patchi) const override
+        {
+            return nu_.boundaryField()[patchi];
+        }
+
+		//- Returns thermal expansion coefficient of He
+        virtual const volScalarField& beta() const override
+		{
+			return betaHe_;
+		}
+
+		//- Returns Goerter-Mellink coefficient for helium based on temperature
+        virtual const volScalarField& AGM() const override
+		{
+			return AGMHe_;
+		}
+
+		//- Returns entropy for helium based on temperature
+        virtual const volScalarField& s() const override
+		{
+			return sHe_;
+		}
+
+		//- Returns dynamic viscosity for helium based on temperature
+        virtual const volScalarField& eta() const override
+		{
+			return etaHe_;
+		}
+	
+		//- Returns specific heat capacity for helium based on temperature
+        virtual const volScalarField& cp() const override
+		{
+			return cpHe_;
+		}
+
+		//- Returns reciprocal of thermal conductivity function for helium based on temperature
+        virtual const volScalarField& k() const override
+		{
+			return onebyf_;
+		}
+
+		virtual const volScalarField& rho() const override
+		{
+			return rhoHe_;
+		}
+
+		static const dimensionedScalar Tlambda() 
+		{
+			return Tlambda_;
+		}
+
+        //- Correct the laminar viscosity and thermal properties of He
+        virtual void correct() override;
+
+        //- Read transportProperties dictionary
+        virtual bool read(const dictionary& viscosityProperties) override;
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace viscosityModels
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

@@ -1,0 +1,4 @@
+#!/bin/bash
+cd $1
+ctags --extra=+qf --fields=+l -f .tags *
+#find * -type d -exec ./dirtags {} \;

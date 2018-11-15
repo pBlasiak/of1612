@@ -1,0 +1,59 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// water at saturation pressure 
+//phaseChange true;
+
+phases (water vapor);
+
+
+phaseChangeTwoPhaseMixture Lee;//
+
+densityWeighted off;
+
+sigma           sigma       [1 0 -2 0 0 0 0]     0.042217;
+
+water //liquid
+{
+    transportModel Newtonian;
+    nu              nu  [0 2 -1 0 0 0 0]  1.69E-007;
+    rho             rho [1 -3 0 0 0 0 0]  887.13;
+    cp		    cp   [0 2 -2 -1 0 0 0] 2.71E+003;//4.40E+003; CpL=Cpg
+    k		    k   [1 1 -3 -1 0 0 0] 0.6733;
+}
+
+vapor //vapor
+{
+	transportModel Newtonian;
+    nu              nu [0 2 -1 0 0 0 0]  2.92E-006; 
+    rho             rho [1 -3 0 0 0 0 0] 5.145;
+    cp		    cp [0 2 -2 -1 0 0 0]  2.71E+003;
+    k		    k  [1 1 -3 -1 0 0 0] 0.0364;
+}
+
+LeeCoeffs
+{
+    Cv            rv		   [0 0 -1 0 0 0 0]    1;
+    Cc            rc		   [0 0 -1 0 0 0 0]    0;
+    TSat          TSat       [0 0  0  1 0 0 0]    453.03;// saturation Temperature 
+    pSat          pSat       [1 -1 -2 0 0 0 0]   1.00E+006;
+	hEvap		  hEvap	    [0 2 -2 0 0 0 0]     2014580;// J/kg
+	R             R          [0 2 -2 -1 0 0 0]    461.0; //
+
+	TSatLocal        false;
+	cutoff			cutoff [0 0 0 0 0 0 0] 0;
+}
+
+// ************************************************************************* //

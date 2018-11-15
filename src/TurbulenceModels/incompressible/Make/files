@@ -1,0 +1,5 @@
+turbulentTransportModels/derivedFvPatchFields/wallFunctions/alphatWallFunctions/alphatJayatillekeWallFunctionTemprPr/alphatJayatillekeWallFunctionTemprPrFvPatchScalarField.C
+
+turbulentTransportModels/derivedFvPatchFields/turbulentHeatFluxTemperature/turbulentHeatFluxTemperatureFvPatchScalarField.C
+
+LIB = $(FOAM_USER_LIBBIN)/libincompressibleBCsPB

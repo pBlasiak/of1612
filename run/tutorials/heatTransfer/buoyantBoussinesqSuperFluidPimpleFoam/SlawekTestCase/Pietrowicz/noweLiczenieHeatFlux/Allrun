@@ -1,0 +1,27 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+#./Allclean
+
+#export FOAM_USER_APPBIN=/home/$USER/OpenFOAM/$USER-$WM_PROJECT_VERSION/platforms/$WM_OPTIONS/bin
+#
+#export FOAM_USER_LIBBIN=/home/$USER/OpenFOAM/$USER-$WM_PROJECT_VERSION/platforms/$WM_OPTIONS/lib
+#
+#export WM_PROJECT_USER_DIR=/home/$USER/OpenFOAM/$USER-$WM_PROJECT_VERSION
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application=$(getApplication)
+
+#runApplication fluent3DMeshToFoam thermosyphonmm.msh -scale 0.001
+#cp constant/boundary.orig constant/polyMesh/boundary
+#runApplication blockMesh
+#runApplication checkMesh -allTopology
+#runApplication decomposePar 
+#runApplication setFields 
+#runParallel renumberMesh -overwrite
+#runApplication renumberMesh -overwrite
+#runParallel $application
+runApplication $application
+#runApplication reconstructPar
+
+#------------------------------------------------------------------------------

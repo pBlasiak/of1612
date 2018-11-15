@@ -1,0 +1,57 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1606+                                |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       surfaceScalarField;
+    location    "0";
+    object      phi;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 3 -1 0 0 0 0];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    INLET
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    OUTLET
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    SYMMETRY-SIDE-1
+    {
+        type            wedge;
+        value           uniform 0;
+    }
+    SYMMETRY-SIDE-2
+    {
+        type            wedge;
+        value           uniform 0;
+    }
+    WALL
+    {
+        type            calculated;
+        value           uniform 0;
+    }
+    defaultFaces
+    {
+        type            empty;
+        value           nonuniform 0();
+    }
+}
+
+
+// ************************************************************************* //

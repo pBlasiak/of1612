@@ -1,0 +1,32 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+application=$(getApplication)
+
+
+runApplication blockMesh
+
+#refresh alpha1 
+cp 0/alpha1.org 0/alpha.water
+cp 0/T.org 0/T
+
+
+#runApplication checkMesh -allTopology
+#runApplication decomposePar 
+#runApplication setFields 
+#runParallel renumberMesh -overwrite
+#runParallel $application
+runApplication $application
+#runApplication reconstructPar
+
+
+#paraFoam -touchAll
+#
+#( cd validation && ./createGraphs ) 
+#
+#cd ../
+
+# ----------------------------------------------------------------- end-of-file

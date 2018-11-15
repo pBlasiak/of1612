@@ -1,0 +1,7 @@
+rm -r ?.*
+rm -r [1-9]
+rm -r 10
+rm -r 1000
+rm -r ??
+rm -r ???
+rm IFposition.gp

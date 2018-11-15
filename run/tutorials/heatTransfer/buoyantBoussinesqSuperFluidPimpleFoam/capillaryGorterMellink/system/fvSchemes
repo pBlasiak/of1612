@@ -1,0 +1,93 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1606+                                |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+   default         Gauss linear;
+//    default         pointCellsLeastSquares;
+//    default         fourth;
+//    default         leastSquares;
+//    default         Gauss cubic;
+//    default         Gauss linear;
+//    default         cellMDLimited Gauss linear 0.5;
+//	grad(p*rho)		fourth;
+//    default         cellMDLimited Gauss linear 0.33;
+}
+
+divSchemes
+{
+    default         none;
+    div(phi,U)      bounded Gauss linearUpwind grad(U);
+//    div(phi,U)      bounded Gauss upwind; 
+    div(phi,k)      bounded Gauss upwind;
+    div(phi,omega)      bounded Gauss upwind;
+//    div(phi,k)      Gauss upwind;
+//    div(phi,k)      Gauss linearUpwind default;
+//    div(phi,T)      Gauss vanLeer;
+    div(phi,T)      bounded Gauss upwind;
+//    div(phi,T)      Gauss upwind;
+//    div(phi,T)      Gauss linearUpwind default;
+//    div(phi,epsilon) Gauss upwind;
+    div(phi,epsilon) bounded Gauss upwind;
+//    div(phi,epsilon)      Gauss linearUpwind default;
+	div(G)          Gauss linear;
+	div(Grest)          Gauss linear;
+	div(V)          Gauss linear;
+	div((alphaEff*Grest_))          Gauss linear;
+    div(phi,R)      bounded Gauss upwind;
+    div(R)          Gauss linear;
+    div(phi,nuTilda) bounded Gauss upwind;
+    div((nuEff*dev2(T(grad(U))))) Gauss linear;
+	div((alphaEff*((-grad(P)|rho)|s))) Gauss linear;
+	div((alphaEff*((grad((p*rho))|rho)|s))) Gauss linear;
+	div(((-grad((p*rho))|rho)|s)) Gauss linear;
+	div((alphaEff*((-grad((p*rho))|rho)|s))) Gauss linear; //-grad((p*rho)) czy plus??
+}
+
+laplacianSchemes
+{
+//    default         Gauss linear corrected;
+    default         Gauss linear limited corrected 0.5;
+//    default         Gauss linear limited corrected 0.33;
+//    default         Gauss linear limited corrected 0;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         orthogonal;
+//    default         corrected;
+//    default         limited corrected 0.5;
+//    default         limited corrected 0.33;
+//    default         limited corrected 0;
+}
+wallDist
+{
+    method meshWave;
+}
+
+
+// ************************************************************************* //

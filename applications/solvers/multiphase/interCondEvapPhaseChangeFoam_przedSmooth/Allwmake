@@ -1,0 +1,19 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+export FOAM_USER_APPBIN=/home/$USER/OpenFOAM/$USER-$WM_PROJECT_VERSION/platforms/$WM_OPTIONS/bin
+
+export FOAM_USER_LIBBIN=/home/$USER/OpenFOAM/$USER-$WM_PROJECT_VERSION/platforms/$WM_OPTIONS/lib
+
+export WM_PROJECT_USER_DIR=/home/$USER/OpenFOAM/$USER-$WM_PROJECT_VERSION
+
+# Parse arguments for library compilation
+targetType=libso
+. $WM_PROJECT_DIR/wmake/scripts/AllwmakeParseArguments
+set -x
+
+wmake $targetType phaseChangeTwoPhaseMixtures
+wmake
+#wmake interPhaseChangeDyMFoam
+
+#------------------------------------------------------------------------------

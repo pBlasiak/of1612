@@ -1,0 +1,46 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1606+                                |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      transportProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+simplifiedSuperFluid  Kitamura;
+
+transportModel  HeliumConstRho;
+HeliumConstCoeffs
+{
+	TMean            [0 0 0 1 0 0 0] 1.675;
+}
+HeliumConstRhoCoeffs
+{
+}
+superFluidWallCoeffs
+{
+}
+
+KitamuraCoeffs
+{
+}
+PietrowiczCoeffs
+{
+	GM		on;
+}
+
+// Turbulent Prandtl number
+Prt             [0 0 0 0 0 0 0] 0.7;
+
+// Reference temperature
+TRef            [0 0 0 1 0 0 0] 1.95;
+
+// ************************************************************************* //

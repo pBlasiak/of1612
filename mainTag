@@ -1,0 +1,2 @@
+#!/bin/bash
+ctags --file-scope=no --extra=+qf --fields=+l -Rf .tags .

@@ -1,0 +1,14 @@
+viscosityModels/viscosityModel/viscosityModel.C
+viscosityModels/viscosityModel/viscosityModelNew.C
+viscosityModels/HeliumConst/HeliumConst.C
+viscosityModels/HeliumConstRho/HeliumConstRho.C
+viscosityModels/HeliumFineOnebyfConstRho/HeliumFineOnebyfConstRho.C
+viscosityModels/Helium/Helium.C
+viscosityModels/HeliumFineOnebyf/HeliumFineOnebyf.C
+
+transportModel/transportModel.C
+singlePhaseTransportModel/singlePhaseTransportModel.C
+
+incompressibleTwoPhaseMixture/incompressibleTwoPhaseMixture.C
+
+LIB = $(FOAM_USER_LIBBIN)/libincompressibleTransportModelsPB

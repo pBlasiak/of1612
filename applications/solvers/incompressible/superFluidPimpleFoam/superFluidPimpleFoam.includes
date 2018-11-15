@@ -1,0 +1,11 @@
+.
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/TurbulenceModels/turbulenceModels/lnInclude
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/TurbulenceModels/incompressible/lnInclude
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/transportModels
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/transportModels/incompressible/singlePhaseTransportModel
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/finiteVolume/lnInclude
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/meshTools/lnInclude
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/sampling/lnInclude
+/lnInclude
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/OpenFOAM/lnInclude
+/home/przemek/OpenFOAM/OpenFOAM-v1606+/src/OSspecific/POSIX/lnInclude
