@@ -1,0 +1,5 @@
+ClassPolynom/ClassPolynom.C
+HepakThermo/HepakThermo.C
+HeIIFoam.C
+
+EXE = $(FOAM_USER_APPBIN)/HeIIFoam
