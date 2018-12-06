@@ -2,47 +2,48 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2013 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 1991-2009 OpenCFD Ltd.
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
 
-    OpenFOAM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    OpenFOAM is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Generac License as published by the
+    Free Software Foundation; either  2 of the License, or (at your
+    option) any later version.
 
-    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    OpenFOAM is distributed in the ho it will be useful, but WITHOUT
+    ANY WARRANTY; without even the imarranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.he GNU General Public License
     for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy oNU General Public License
+    along with OpenFOAM; if not, write Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floorn, MA 02110-1301 USA
 
 Class
-    Foam::phaseChangeTwoPhaseMixtures::Lee
+    Foam::phaseChangeTwoPhaseMixtures::Tanasawa
 
 Description
-    Lee phase change model. It is based on saturation temperature.
-	For T < TSat => condensation occurs
-	and T > TSat => evaporation occurs
+    Tanasawa phase change model.
+	The model supports condensation and evaporation mass transfer.
 
     Reference:
     \verbatim
-        Lee, W.H.
-        "A Pressure Iteration Scheme for Two-Phase Modeling. Technical Report LA-UR 79-975",
-        Los Alamos Scientific Laboratory, Los Alamos, New Mexico, 1979.
+        Tanasawa, I.
+        "Advances in condensation heat transfer",
+        Advances in Heat Transfer, vol. 21, 1991, pp. 55-139.
     \endverbatim
 
+
 SourceFiles
-    Lee.C
+    Tanasawa.C
 
 \*--------------------------------------------------------------------*/
 
-#ifndef Lee_H
-#define Lee_H
+#ifndef Tanasawa_H
+#define Tanasawa_H
 
 #include "phaseChangeTwoPhaseMixture.H"
 
@@ -54,45 +55,51 @@ namespace phaseChangeTwoPhaseMixtures
 {
 
 /*--------------------------------------------------------------------*\
-                              Class Lee
+                              Class Tanasawa
 \*--------------------------------------------------------------------*/
 
-class Lee
+class Tanasawa
 :
     public phaseChangeTwoPhaseMixture
 {
     // Private data
 
-        dimensionedScalar Cc_;
-        dimensionedScalar Cv_;
+    	Switch cond_;
 
-        dimensionedScalar mcCoeff_;
-        dimensionedScalar mvCoeff_;
+    	Switch evap_;
 
+    	dimensionedScalar gamma_;
+
+        dimensionedScalar mCoeff_;
+		
+    // Private member functions
+
+        volScalarField calcGradAlphal() const;
 
 public:
 
     //- Runtime type information
-    TypeName("Lee");
+    TypeName("Tanasawa");
 
 
     // Constructors
 
         //- construct from components
-        Lee
+        Tanasawa
         (
             const volVectorField& U,
             const surfaceScalarField& phi
         );
 
 
-    //- Destructor
-    virtual ~Lee()
-    {}
+    // Destructor
+
+        virtual ~Tanasawa()
+        {}
 
 
     // Member Functions
-	
+
 
         //- Return the mass condensation and vaporisation rates as a
         //  coefficient to multiply (1 - alphal) for the condensation rate

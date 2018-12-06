@@ -12,6 +12,38 @@ volScalarField p_rgh
     mesh
 );
 
+// Need to store rho for ddt(rho, U)
+volScalarField rho
+(
+    IOobject
+    (
+        "rho",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT
+    ),
+    mesh,
+	dimensionedScalar("rho0", dimDensity, 0.0)
+);
+rho.oldTime();
+
+#include "readGravitationalAcceleration.H"
+#include "readhRef.H"
+#include "gh.H"
+
+volScalarField p
+(
+    IOobject
+    (
+        "p",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    p_rgh + rho*gh
+);
+
 Info<< "Reading field T\n" << endl;
 volScalarField T
 (
@@ -58,22 +90,13 @@ const dimensionedScalar& cp1 = mixture->cp1();
 const dimensionedScalar& cp2 = mixture->cp2();
 const dimensionedScalar& hEvap = mixture->hEvap();
 const dimensionedScalar& pSat = mixture->pSat();
-volScalarField TSat = mixture->TSatLocal();
 const dimensionedScalar& cutoff = mixture->cutoff();
 
-// Need to store rho for ddt(rho, U)
-volScalarField rho
-(
-    IOobject
-    (
-        "rho",
-        runTime.timeName(),
-        mesh,
-        IOobject::READ_IF_PRESENT
-    ),
-    alpha1*rho1 + alpha2*rho2
-);
-rho.oldTime();
+rho = alpha1*rho1 + alpha2*rho2;
+p = p_rgh + rho*gh;
+mixture->correct();
+volScalarField TSat = mixture->TSat();
+
 
 //    surfaceScalarField rhoPhi
 //    (
@@ -114,31 +137,51 @@ rho.oldTime();
         alpha1*cp1 + alpha2*cp2
     );
 
-    volScalarField mCond
+// Need to store rho for ddt(rhoCp, U)
+    volScalarField rhoCp
     (
         IOobject
         (
-            "mCond",
+            "rhoCp",
             runTime.timeName(),
             mesh,
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
-        mixture->mDot()[0]
+        rho1*alpha1*cp1 + rho2*alpha2*cp2
     );
+	rhoCp.oldTime();
 
-    volScalarField mVap
-    (
-        IOobject
-        (
-            "mVap",
-            runTime.timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mixture->mDot()[1]
-    );
+    //volScalarField mCond
+    //(
+    //    IOobject
+    //    (
+    //        "mCond",
+    //        runTime.timeName(),
+    //        mesh,
+    //        IOobject::NO_READ,
+    //        IOobject::NO_WRITE
+    //        //IOobject::AUTO_WRITE
+    //    ),
+    //    //mixture->mDotAlphal()[0]()*(1.0 - alpha1)
+    //    mixture->mCondDotAlphal()*(1.0 - alpha1)
+    //);
+
+    //volScalarField mVap
+    //(
+    //    IOobject
+    //    (
+    //        "mVap",
+    //        runTime.timeName(),
+    //        mesh,
+    //        IOobject::NO_READ,
+    //        IOobject::NO_WRITE
+    //        //IOobject::AUTO_WRITE
+    //    ),
+    //    //mixture->mDotAlphal()[1]*alpha1
+    //    mixture->mEvapDotAlphal()*alpha1
+    //);
+
 // Construct interface from alpha1 distribution
 smoothInterfaceProperties interface(alpha1, U, mixture());
 
@@ -146,25 +189,6 @@ smoothInterfaceProperties interface(alpha1, U, mixture());
 autoPtr<incompressible::turbulenceModel> turbulence
 (
     incompressible::turbulenceModel::New(U, phi, mixture())
-);
-
-
-#include "readGravitationalAcceleration.H"
-#include "readhRef.H"
-#include "gh.H"
-
-
-volScalarField p
-(
-    IOobject
-    (
-        "p",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    p_rgh + rho*gh
 );
 
 label pRefCell = 0;

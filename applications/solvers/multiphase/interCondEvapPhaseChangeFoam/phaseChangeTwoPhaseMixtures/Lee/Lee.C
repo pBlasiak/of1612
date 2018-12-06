@@ -50,256 +50,70 @@ Foam::phaseChangeTwoPhaseMixtures::Lee::Lee
     Cc_(phaseChangeTwoPhaseMixtureCoeffs_.lookup("Cc")),
     Cv_(phaseChangeTwoPhaseMixtureCoeffs_.lookup("Cv")),
 
-//    p0_("p0", pSat().dimensions(), 0.0),
-//    TSat_(phaseChangeTwoPhaseMixtureCoeffs_.lookup("TSat")),
-//    T0_("T0", dimensionSet(0,0,0,0,0,0,0), 0.0),
-
     mcCoeff_(Cc_*rho2()),
     mvCoeff_(Cv_*rho1())
 {
-    correct();
+	//TODO: sprawdz czy model jest w solverze korektowany
 }
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
 Foam::Pair<Foam::tmp<Foam::volScalarField> >
-Foam::phaseChangeTwoPhaseMixtures::Lee::mDot() const
+Foam::phaseChangeTwoPhaseMixtures::Lee::mDotAlphal() 
+//Foam::phaseChangeTwoPhaseMixtures::Lee::mDotAlphal() const
 {
-    const volScalarField& T = alpha1_.db().lookupObject<volScalarField>("T");
-	const volScalarField TSat = TSatLocal();
-    volScalarField limitedAlpha1 = min(max(alpha1_, scalar(0)), scalar(1));
-
-    volScalarField mCon
-    (
-        IOobject
-        (
-            "mCon",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mCon", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-    
-    volScalarField mVap
-    (
-        IOobject
-        (
-            "mVap",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mVap", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-
-	forAll(T, celli)
-	{
-		if (T[celli] == TSat[celli])
-		{
-			mCon[celli] = 0.0;
-			mVap[celli] = 0.0;
-		}
-		else if (T[celli] < TSat[celli]) mCon[celli] = (T[celli] - TSat[celli])/TSat[celli];
-		else							   mVap[celli] = (T[celli] - TSat[celli])/TSat[celli];
-	}
-	
-    return Pair<tmp<volScalarField> >
-    (
-        (-mcCoeff_)*mCon*(1.0 - limitedAlpha1),
-
-        (-mvCoeff_)*mVap*limitedAlpha1
-    );
-}
-
-
-Foam::Pair<Foam::tmp<Foam::volScalarField> >
-Foam::phaseChangeTwoPhaseMixtures::Lee::mDotAlphal() const
-{
-    const volScalarField& T = alpha1_.db().lookupObject<volScalarField>("T");
-	const volScalarField TSat = TSatLocal();
+    //const volScalarField& T = alpha1_.db().lookupObject<volScalarField>("T");
+//	TSatLocal();
 //    volScalarField limitedAlpha1 = min(max(alpha1_, scalar(0)), scalar(1));
 
-    volScalarField mCon
-    (
-        IOobject
-        (
-            "mCon",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mCon", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-    
-    volScalarField mVap
-    (
-        IOobject
-        (
-            "mVap",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mVap", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
+    const dimensionedScalar T0("0", dimTemperature, 0.0);
 
-	forAll(T, celli)
-	{
-		if (T[celli] == TSat[celli])
-		{
-			mCon[celli] = 0.0;
-			mVap[celli] = 0.0;
-		}
-		else if (T[celli] < TSat[celli]) mCon[celli] = (T[celli] - TSat[celli])/TSat[celli];
-		else							   mVap[celli] = (T[celli] - TSat[celli])/TSat[celli];
-	}
-	
     return Pair<tmp<volScalarField> >
     (
-        (-mcCoeff_)*mCon,
+		// minus sign "-" to provide mc > 0  and mv < 0
+		-mcCoeff_*min(T_ - TSat_, T0)/TSat_,
 
-        (-mvCoeff_)*mVap
+		-mvCoeff_*max(T_ - TSat_, T0)/TSat_
     );
-//    return Pair<tmp<volScalarField> >
-//    (
-//        (-mcCoeff_)*min((T - TSat_)/TSat_, T0_),
-//
-//        (-mvCoeff_)*max((T - TSat_)/TSat_, T0_)
-//    );
 }
 
 Foam::Pair<Foam::tmp<Foam::volScalarField> >
-Foam::phaseChangeTwoPhaseMixtures::Lee::mDotP() const
+Foam::phaseChangeTwoPhaseMixtures::Lee::mDotP() 
+//Foam::phaseChangeTwoPhaseMixtures::Lee::mDotP() const
 {
-    const volScalarField& T = alpha1_.db().lookupObject<volScalarField>("T");
-	const volScalarField TSat = TSatLocal();
-    volScalarField limitedAlpha1 = min(max(alpha1_, scalar(0)), scalar(1));
-
-    volScalarField mCon
-    (
-        IOobject
-        (
-            "mCon",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mCon", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-    
-    volScalarField mVap
-    (
-        IOobject
-        (
-            "mVap",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mVap", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-
-	forAll(T, celli)
-	{
-		if (T[celli] == TSat[celli])
-		{
-			mCon[celli] = 0.0;
-			mVap[celli] = 0.0;
-		}
-		else if (T[celli] < TSat[celli]) mCon[celli] = (T[celli] - TSat[celli])/TSat[celli];
-		else							   mVap[celli] = (T[celli] - TSat[celli])/TSat[celli];
-	}
+    const volScalarField limitedAlpha1 = min(max(alpha1_, scalar(0)), scalar(1));
+    const dimensionedScalar T0("0", dimTemperature, 0.0);
 
     return Pair<tmp<volScalarField> >
     (
-        (-mcCoeff_)*(1.0 - limitedAlpha1)*mCon,
+		// minus sign "-" to provide mc > 0  and mv < 0
+        -mcCoeff_*(1.0 - limitedAlpha1)*min(T_ - TSat_, T0)/TSat_
+		*pos(p_ - pSat_)/max(p_ - pSat_, 1E-8*pSat_),
 
-        (-mvCoeff_)*limitedAlpha1*mVap
+        -mvCoeff_*limitedAlpha1*max(T_ - TSat_, T0)/TSat_
+		*neg(p_ - pSat_)/min(p_ - pSat_, 1E-8*pSat_)
     );
-//    return Pair<tmp<volScalarField> >
-//    (
-//        (-mcCoeff_)*(1.0 - limitedAlpha1)*(T - TSat_)/TSat_*neg(T - TSat_),
-//
-//        (-mvCoeff_)*limitedAlpha1*(T - TSat_)/TSat_*pos(T - TSat_)
-//    );
 }
 
 Foam::Pair<Foam::tmp<Foam::volScalarField> >
-Foam::phaseChangeTwoPhaseMixtures::Lee::mDotT() const
+Foam::phaseChangeTwoPhaseMixtures::Lee::mDotT()
+//Foam::phaseChangeTwoPhaseMixtures::Lee::mDotT() const
 {
-    const volScalarField& T = alpha1_.db().lookupObject<volScalarField>("T");
-	const volScalarField TSat = TSatLocal();
     volScalarField limitedAlpha1 = min(max(alpha1_, scalar(0)), scalar(1));
-
-    volScalarField mCon
-    (
-        IOobject
-        (
-            "mCon",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mCon", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-    
-    volScalarField mVap
-    (
-        IOobject
-        (
-            "mVap",
-            U_.time().timeName(),
-            U_.db(),
-			IOobject::NO_READ,
-			IOobject::NO_WRITE
-        ),
-        U_.mesh(),
-        dimensionedScalar("mVap", dimensionSet(0, 0, 0, 0, 0, 0, 0), 0.0)
-    );
-
-	forAll(T, celli)
-	{
-		if (T[celli] == TSat[celli])
-		{
-			mCon[celli] = 0.0;
-			mVap[celli] = 0.0;
-		}
-		else if (T[celli] < TSat[celli]) mCon[celli] = (T[celli] - TSat[celli])/TSat[celli];
-		else							   mVap[celli] = limitedAlpha1[celli];
-	}
 
     return Pair<tmp<volScalarField> >
     (
-        (-mcCoeff_)*(1.0 - limitedAlpha1)*mCon,
+		// minus sign "-" to provide mc > 0  
+		// now also mv > 0 but in TEqn, term (mc - mv) is applied
+        -mcCoeff_*(1.0 - limitedAlpha1)*neg(T_ - TSat_)/TSat_,
 
-        (-mvCoeff_)*mVap
+        mvCoeff_*limitedAlpha1*pos(T_ - TSat_)/TSat_
     );
-//    return Pair<tmp<volScalarField> >
-//    (
-//        (-mcCoeff_)*(1.0 - limitedAlpha1)*(T - TSat_)/TSat_*neg(T - TSat_),
-//
-//        (-mvCoeff_)*limitedAlpha1*pos(T - TSat_)
-//    );
 }
 
-void Foam::phaseChangeTwoPhaseMixtures::Lee::correct()
-{}
+//void Foam::phaseChangeTwoPhaseMixtures::Lee::correct()
+//{}
 
 
 bool Foam::phaseChangeTwoPhaseMixtures::Lee::read()

@@ -63,8 +63,31 @@ protected:
 
         dictionary phaseChangeTwoPhaseMixtureCoeffs_;
 
-        //- Saturation temperature
-        dimensionedScalar TSat_;
+		//- Condensation mass flux, kg/s/m3 (+)
+		volScalarField mCondDotAlphal_;
+		
+		//- Vaporisation mass flux, kg/s/m3 (-)
+		volScalarField mEvapDotAlphal_;
+		
+		volScalarField mCondDotP_;
+
+		volScalarField mEvapDotP_;
+
+		volScalarField mCondDotT_;
+
+		volScalarField mEvapDotT_;
+
+        //- Reference to pressure field
+        const volScalarField& p_;
+
+        //- Reference to temperature field
+        const volScalarField& T_;
+
+        //- Global saturation temperature
+        dimensionedScalar TSatG_;
+		
+        //- Local saturation temperature
+        volScalarField TSat_;
 
         //- Saturation vapour pressure
         dimensionedScalar pSat_;
@@ -76,7 +99,7 @@ protected:
         dimensionedScalar R_;
 
 		//-True if saturation vapour temperature is based on pressure
-		Switch TSatLocal_;
+		Switch TSatLocalPressure_;
 		
         //- cutoff scalar for interface 
         dimensionedScalar cutoff_;
@@ -90,6 +113,11 @@ protected:
         //- Disallow default bitwise assignment
         void operator=(const phaseChangeTwoPhaseMixture&);
 
+//protected:
+
+		//- Calculates local saturation temperature field based on pressure
+		//  using simplified Clausius-Clapeyron equation 
+		void calcTSatLocal();
 
 public:
 
@@ -140,13 +168,31 @@ public:
 
     // Member Functions
 
-        //- Return const-access to the saturation temperature
-        const dimensionedScalar& TSat() const
+        //- Return const-access to the mCondDotAlphal_
+        const volScalarField& mCondDotAlphal() const
+        {
+            return mCondDotAlphal_;
+        }
+		
+        //- Return const-access to the mEvapDotAlphal_
+        const volScalarField& mEvapDotAlphal() const
+        {
+            return mEvapDotAlphal_;
+        }
+
+        //- Return const-access to the global saturation temperature
+        const dimensionedScalar& TSatG() const
+        {
+            return TSatG_;
+        }
+		
+        //- Return const-access to the local saturation temperature
+        const volScalarField& TSat() const
         {
             return TSat_;
         }
 
-        //- Return const-access to the saturation vapour pressure
+        //- Return const-access to the global saturation vapour pressure
         const dimensionedScalar& pSat() const
         {
             return pSat_;
@@ -170,37 +216,43 @@ public:
             return cutoff_;
         }
 
-		//- Return saturation temperature field based on pressure
-		volScalarField TSatLocal() const;
-
-		//- Return the mass condensation and vaporisation rates
-		virtual Pair<tmp<volScalarField> > mDot() const = 0;
 
         //- Return the mass condensation and vaporisation rates as a
         //  coefficient to multiply (1 - alphal) for the condensation rate
         //  and a coefficient to multiply  alphal for the vaporisation rate
-        virtual Pair<tmp<volScalarField>> mDotAlphal() const = 0;
+		//  in alphaEqn
+        //virtual Pair<tmp<volScalarField>> mDotAlphal() const = 0;
+        virtual Pair<tmp<volScalarField>> mDotAlphal()  = 0;
 
         //- Return the mass condensation and vaporisation rates as coefficients
-        //  to multiply (p - pSat)
-        virtual Pair<tmp<volScalarField>> mDotP() const = 0;
+        //  to multiply (p - pSat) in pEqn
+        //virtual Pair<tmp<volScalarField>> mDotP() const = 0;
+        virtual Pair<tmp<volScalarField>> mDotP() = 0;
 
-		//- Return the mass condensation and vaporisation rates as an
-		//  explicit term for the condensation rate and a coefficient to
-		//  multiply T/TSat for the vaporisation rate
-        virtual Pair<tmp<volScalarField> > mDotT() const = 0;
+        //- Return the mass condensation and vaporisation rates as coefficients
+        //  to multiply (T - TSat) in TEqn
+        //virtual Pair<tmp<volScalarField> > mDotT() const = 0;
+        virtual Pair<tmp<volScalarField> > mDotT() = 0;
 
         //- Return the volumetric condensation and vaporisation rates as a
         //  coefficient to multiply (1 - alphal) for the condensation rate
         //  and a coefficient to multiply  alphal for the vaporisation rate
-        Pair<tmp<volScalarField>> vDotAlphal() const;
+		//  in alphaEqn
+        //Pair<tmp<volScalarField>> vDotAlphal() const;
+        Pair<tmp<volScalarField>> vDotAlphal();
 
         //- Return the volumetric condensation and vaporisation rates as
         //  coefficients to multiply (p - pSat)
-        Pair<tmp<volScalarField>> vDotP() const;
+        //Pair<tmp<volScalarField>> vDotP() const;
+        Pair<tmp<volScalarField>> vDotP();
+		
+        //- Return the volumetric condensation and vaporisation rates as
+        //  coefficients to multiply (T - TSat)
+        //Pair<tmp<volScalarField>> vDotT() const;
+        Pair<tmp<volScalarField>> vDotT();
 
         //- Correct the phaseChange model
-        virtual void correct() = 0;
+        virtual void correct();
 
         //- Read the transportProperties dictionary and update
         virtual bool read() = 0;

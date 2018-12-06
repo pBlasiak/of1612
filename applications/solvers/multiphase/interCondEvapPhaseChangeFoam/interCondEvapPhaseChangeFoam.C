@@ -22,22 +22,21 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    interPhaseChangeFoam
+    interCondEvapPhaseChangeFoam
 
 Group
     grpMultiphaseSolvers
 
 Description
-    Solver for 2 incompressible, isothermal immiscible fluids with phase-change
-    (e.g. cavitation).  Uses a VOF (volume of fluid) phase-fraction based
+    Solver for 2 incompressible, immiscible fluids with phase-change
+    (condensation, evaporation).  Uses a VOF (volume of fluid) phase-fraction based
     interface capturing approach.
 
     The momentum and other fluid properties are of the "mixture" and a
     single momentum equation is solved.
 
-    The set of phase-change models provided are designed to simulate cavitation
-    but other mechanisms of phase-change are supported within this solver
-    framework.
+    The set of phase-change models provided are designed to simulate evaporation
+    and condensation.
 
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
@@ -86,12 +85,36 @@ int main(int argc, char *argv[])
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
+            surfaceScalarField rhoPhiCp
+            (
+                IOobject
+                (
+                    "rhoPhiCp",
+                    runTime.timeName(),
+                    mesh
+                ),
+                mesh,
+                dimensionedScalar("0", dimMass/dimTime*dimSpecificHeatCapacity, 0)
+            );
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
             #include "alphaControls.H"
 
+			dimensionedScalar zeroMassFlux("0", dimensionSet(1,2,-3,-1,0,0,0), 0.0);
+			rhoPhiCp = zeroMassFlux;
+            //surfaceScalarField rhoPhiCp
+            //(
+            //    IOobject
+            //    (
+            //        "rhoPhiCp",
+            //        runTime.timeName(),
+            //        mesh
+            //    ),
+            //    mesh,
+            //    dimensionedScalar("0", dimMass/dimTime*dimSpecificHeatCapacity, 0)
+            //);
             surfaceScalarField rhoPhi
             (
                 IOobject
@@ -106,7 +129,6 @@ int main(int argc, char *argv[])
 //			dimensionedScalar zeroMassFlux("0", dimMass/dimTime, 0);
 //			rhoPhi = zeroMassFlux;
 
-            mixture->correct();
 
             #include "alphaEqnSubCycle.H"
             interface.correct();
@@ -125,13 +147,19 @@ int main(int argc, char *argv[])
                 turbulence->correct();
             }
         }
+        //#include "TEqn.H" // w Nima Sam tutaj jest TEqn
+            //mixture->correct(); // w Nima Sam tutaj jest correct()
+
+        mixture->correct();
 
         runTime.write();
+    volScalarField limitedAlpha1 = min(max(alpha1, scalar(0)), scalar(1));
 
+		// TODO zrob save mv i mc zeby nie trzeba tego liczyc ???
         Info<< "****Condensation rate: "
-            << gSum(mixture->mDotAlphal()[0]*mesh.V())*hEvap.value() << " W" << endl;
+            << gSum(mixture->mDotAlphal()[0]*mesh.V()*(1.0 - limitedAlpha1))*hEvap.value() << " W" << endl;
         Info<< "****Evaporation rate: "
-            << gSum(mixture->mDotAlphal()[1]*mesh.V())*hEvap.value() << " W" << endl;
+            << gSum(mixture->mDotAlphal()[1]*mesh.V()*limitedAlpha1)*hEvap.value()  << " W" << endl;
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
