@@ -35,12 +35,26 @@
 		if (alpha1[celli] < 1.0 - cutoff.value() && alpha1[celli] > cutoff.value()) IF[celli] = 1.0;
 	}
 
-	//	for Nima Sam TEqn
-//	volScalarField k= k1*alpha1 + (1.0 - alpha1)*k2;
-//	volScalarField rhoC = rho1*cp1*alpha1 + (1.0 - alpha1)*rho2*cp2;
 
 	TSat = mixture->TSat();
 
+	if (NimaSamTEqn)
+	{
+		Info<< "Nima Sam TEqn is solved." << endl;
+	//	for Nima Sam TEqn
+	volScalarField k= k1*alpha1 + (1.0 - alpha1)*k2;
+	volScalarField rhoC = rho1*cp1*alpha1 + (1.0 - alpha1)*rho2*cp2;
+	    fvScalarMatrix TEqn
+	    (
+			  fvm::ddt(T)
+			+ fvm::div(phi, T)
+		    - fvm::Sp(fvc::div(phi),T)
+			- fvm::laplacian( k/rhoC , T,"laplacian(alphaEff,T)")
+		);
+    TEqn.solve();
+	}
+	else
+	{
     fvScalarMatrix TEqn
     (
 //	 // Nima Sam TEqn
@@ -57,7 +71,8 @@
      ==
 		fvm::Sp(vDotcmvT, T) - vDotcmvT*TSat	// TODO update TSat in correct
     );
-	
+    TEqn.solve();
+	}	
 //	// OLD EQUATION:
 //	// TODO try TEqn by Nima Sam?
 //    fvScalarMatrix TEqn
@@ -74,7 +89,7 @@
 
 
 //    TEqn.relax();
-    TEqn.solve();
+//    TEqn.solve();
 
     Info<< "min/max(T) = " << min(T).value() << ", "
         << max(T).value() <<endl;
