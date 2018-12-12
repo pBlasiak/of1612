@@ -20,6 +20,11 @@ Switch NimaSamAlphaEqn
 	transportProperties.lookup("NimaSamAlphaEqn")
 );
 
+Switch NimaSamPEqn
+(
+	transportProperties.lookup("NimaSamPEqn")
+);
+
 Info<< "Reading field p_rgh\n" << endl;
 volScalarField p_rgh
 (
