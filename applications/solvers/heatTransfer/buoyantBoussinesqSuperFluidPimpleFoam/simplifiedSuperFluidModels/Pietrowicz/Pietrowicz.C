@@ -82,19 +82,31 @@ Foam::tmp<Foam::volScalarField> Foam::simplifiedSuperFluids::Pietrowicz::GM() co
 	if (GM_)
 	{
 		return 
-		tmp<volScalarField>
 		(
-		    viscosityModelPtr_->AGM()*rhon_*rhos_*
-		    pow
-		    (
-		        max
-		        (
-		            B_*magG_,
-		      	    dimensionedScalar("small", dimensionSet(0,1,-1,0,0,0,0), SMALL)
-		        ), 
-		        4.0
-		    )
+			   viscosityModelPtr_->AGM()*rhon_*rhos_*
+		       pow
+		       (
+		           max
+		           (
+		               B_*magG_,
+		         	    dimensionedScalar("small", dimensionSet(0,1,-1,0,0,0,0), SMALL)
+		           ), 
+		           4.0
+		       )
 		);
+		//tmp<volScalarField>
+		//(
+		//    viscosityModelPtr_->AGM()*rhon_*rhos_*
+		//    pow
+		//    (
+		//        max
+		//        (
+		//            B_*magG_,
+		//      	    dimensionedScalar("small", dimensionSet(0,1,-1,0,0,0,0), SMALL)
+		//        ), 
+		//        4.0
+		//    )
+		//);
 	} 
 	else
 	{

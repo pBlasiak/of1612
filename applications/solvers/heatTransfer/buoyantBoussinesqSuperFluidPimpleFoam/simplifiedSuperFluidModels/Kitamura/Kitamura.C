@@ -141,77 +141,90 @@ const Foam::volScalarField& Foam::simplifiedSuperFluids::Kitamura::B() const
 Foam::tmp<Foam::volVectorField> Foam::simplifiedSuperFluids::Kitamura::calcUn() const
 {
 	const volVectorField& U = T_.db().lookupObject<volVectorField>("U");
-	return tmp<volVectorField>
-		   (
-		       new volVectorField
-			   (
-			       IOobject
-				   (
-				       T_.mesh().time().timeName(),
-					   T_.mesh(),
-					   IOobject::NO_READ,
-					   IOobject::NO_WRITE
-				   ),
-		           (U - rhos_/rhoHe()*B_*G_)
-			   )
-		   );
+	return (U - rhos_/rhoHe()*B_*G_);
+	//return tmp<volVectorField>
+	//	   (
+	//	       new volVectorField
+	//		   (
+	//		       IOobject
+	//			   (
+	//			       T_.mesh().time().timeName(),
+	//				   T_.mesh(),
+	//				   IOobject::NO_READ,
+	//				   IOobject::NO_WRITE
+	//			   ),
+	//	           (U - rhos_/rhoHe()*B_*G_)
+	//		   )
+	//	   );
 }
 
 Foam::tmp<Foam::volVectorField> Foam::simplifiedSuperFluids::Kitamura::calcUs() const
 {
 	const volVectorField& U = T_.db().lookupObject<volVectorField>("U");
-	return tmp<volVectorField>
-		   (
-		       new volVectorField
-			   (
-			       IOobject
-				   (
-				       T_.mesh().time().timeName(),
-					   T_.mesh(),
-					   IOobject::NO_READ,
-					   IOobject::NO_WRITE
-				   ),
-		           (U + rhon_/rhoHe()*B_*G_)
-			   )
-		   );
+	return (U + rhon_/rhoHe()*B_*G_);
+	//return tmp<volVectorField>
+	//	   (
+	//	       new volVectorField
+	//		   (
+	//		       IOobject
+	//			   (
+	//			       T_.mesh().time().timeName(),
+	//				   T_.mesh(),
+	//				   IOobject::NO_READ,
+	//				   IOobject::NO_WRITE
+	//			   ),
+	//	           (U + rhon_/rhoHe()*B_*G_)
+	//		   )
+	//	   );
 }
 
 Foam::tmp<Foam::volVectorField> Foam::simplifiedSuperFluids::Kitamura::M1() const
 {
-	return tmp<volVectorField>
-		   (
-		       fvc::div(rhon_*rhos_/rhoHe()*B_*B_*G_*G_, "div(V)")
-		   );
+	return (fvc::div(rhon_*rhos_/rhoHe()*B_*B_*G_*G_, "div(V)"));
+	//return tmp<volVectorField>
+	//	   (
+	//	       fvc::div(rhon_*rhos_/rhoHe()*B_*B_*G_*G_, "div(V)")
+	//	   );
 }
 
 Foam::tmp<Foam::volVectorField> Foam::simplifiedSuperFluids::Kitamura::M2() const
 {
-	return tmp<volVectorField>
-		   (
-		       rhos_/rhoHe()*B_*
-			   (
-			       fvc::laplacian(G_) 
-				 + 1./3*fvc::grad(fvc::div(G_))
-			   )
-    //  (4./3*fvc::laplacian(G) + 1./3*fvc::curl(fvc::curl(G)))
-		   );
+	return (rhos_/rhoHe()*B_*(fvc::laplacian(G_) + 1./3*fvc::grad(fvc::div(G_))));
+	//return tmp<volVectorField>
+	//	   (
+	//	       rhos_/rhoHe()*B_*
+	//		   (
+	//		       fvc::laplacian(G_) 
+	//			 + 1./3*fvc::grad(fvc::div(G_))
+	//		   )
+    ////  (4./3*fvc::laplacian(G) + 1./3*fvc::curl(fvc::curl(G)))
+	//	   );
 }
 
 
 Foam::tmp<Foam::volScalarField> Foam::simplifiedSuperFluids::Kitamura::alpha() const
 {
-	return tmp<volScalarField> 
+	return pow
 		   (
-			   pow
-		   	   (
-		   	       max
-		   	       (
-		   	           viscosityModelPtr_->k()/magG_/magG_, 
-		   	    	   dimensionedScalar("small", dimensionSet(3,3,-9,-3,0,0,0), SMALL)
-		   	       ), 
-		   	       1./3
-		   	   )
+		       max
+		       (
+		           viscosityModelPtr_->k()/magG_/magG_, 
+		    	   dimensionedScalar("small", dimensionSet(3,3,-9,-3,0,0,0), SMALL)
+		       ), 
+		       1./3
 		   );
+	//return tmp<volScalarField> 
+	//	   (
+	//		   pow
+	//	   	   (
+	//	   	       max
+	//	   	       (
+	//	   	           viscosityModelPtr_->k()/magG_/magG_, 
+	//	   	    	   dimensionedScalar("small", dimensionSet(3,3,-9,-3,0,0,0), SMALL)
+	//	   	       ), 
+	//	   	       1./3
+	//	   	   )
+	//	   );
 }
 
 Foam::tmp<Foam::volScalarField> Foam::simplifiedSuperFluids::Kitamura::GM() const
